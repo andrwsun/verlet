@@ -1,0 +1,15 @@
+CHANGES.rst
+LICENSE.txt
+MANIFEST.in
+README.rst
+requirements.txt
+setup.cfg
+setup.py
+np/__init__.py
+np/magic.py
+np/quickarrays.py
+np.egg-info/.dropbox.attr
+np.egg-info/PKG-INFO
+np.egg-info/SOURCES.txt
+np.egg-info/dependency_links.txt
+np.egg-info/top_level.txt

@@ -1,0 +1,105 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri May 22 03:05:47 2015
+
+@author: Koos Zevenhoven
+"""
+
+import types
+import sys
+try:
+    import numpy
+except ImportError as e:
+    raise RuntimeError("The numpy package must be installed to use the np extensions. \n"
+                       "Please install numpy using your package manager such as conda or pip.")
+    
+from numpy import array, arange, asanyarray
+
+np_quick_types = {
+    'f': numpy.float_,
+    'f8': numpy.float64,
+    'f64': numpy.float64,
+    'f4': numpy.float32,
+    'f32': numpy.float32,
+    'f2': numpy.float16,
+    'i': numpy.int_,
+#    'i8': numpy.int64,  allow this in the future
+    'i64': numpy.int64,
+    'i4': numpy.int32,
+    'i32': numpy.int32,
+    'i2': numpy.int16,
+    'i16': numpy.int16,
+    'i1': numpy.int8,
+#    'i8': numpy.int8,   not ok; this might mean 8*8 == 64 bits
+    'u8': numpy.uint64,
+    'ui64': numpy.uint64,
+    'u4': numpy.uint32,
+    'ui32': numpy.uint32,
+    'u2': numpy.uint16,
+    'ui16': numpy.uint16,
+    'u1': numpy.uint8,
+#    'ui8': numpy.uint8, not ok; this might mean 8*8 == 64 bits 
+    'c': numpy.complex_,
+    'c16': numpy.complex128,
+#    'c128': numpy.complex128,
+    'c8': numpy.complex64,
+#    'c64': numpy.complex64
+}
+                  
+
+class NPQuickTypeShortcut(object):
+    def __init__(self, shortcut):
+        self.dtype = np_quick_types[shortcut]
+        self._shortcut_name = 'np.' + shortcut
+        
+    def __getitem__(self, arg):
+        if isinstance(arg, tuple):
+            # Assume the tuple was not created by the user,
+            # i.e. multiple arguments to subscript [arg1, ...].
+            return array(arg, dtype = self.dtype)
+        if isinstance(arg, list):
+            return array((arg,), dtype = self.dtype)
+        if isinstance(arg, slice):
+            rangeargs = (arg.start if arg.start is not None else 0, 
+                         arg.stop, 
+                         arg.step if arg.step is not None else 1)
+            return arange(*rangeargs, dtype = self.dtype)
+        return array((arg,), dtype = self.dtype)
+  
+    def __call__(self, *args, **kwargs):
+        return asanyarray(*args, dtype = self.dtype, **kwargs)
+    
+    def __repr__(self):
+        return "<np quick array creator for dtype %s>" % repr(self.dtype.__name__)
+                
+
+class npmodule(types.ModuleType):
+    def __init__(self):
+        self.__name__ = numpy.__name__ # to initialize self.__dict__
+        self.__dict__.update(numpy.__dict__)
+        
+        sys.modules[numpy.__name__] = self
+        sys.modules['np'] = self
+
+    def __getitem__(self, arg):
+        if isinstance(arg, tuple):
+            # Assume the tuple was not created by the user,
+            # i.e. multiple arguments to subscript [arg1, ...].
+            return array(arg)
+        if isinstance(arg, list):
+            return array((arg,))
+        if isinstance(arg, slice):
+            rangeargs = (arg.start if arg.start is not None else 0, 
+                         arg.stop, 
+                         arg.step if arg.step is not None else 1)
+            return arange(*rangeargs)
+        return array((arg,))
+  
+    def __call__(self, *args, **kwargs):
+        return asanyarray(*args, **kwargs)
+        
+    def __repr__(self):
+        return self._repr
+
+_repr = repr(numpy).replace("<module", "<np-enhanced module")
+
