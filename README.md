@@ -1,6 +1,8 @@
 Verlet Integration Fabric Simulator
 not optimized at all LMAO. 
 
+Please leave a star if you download it! Thank you :) 
+
 Things I wanted to put into this but was not good enough at coding:
  1. Quadtree optimization
  2. Different anchor placements:
