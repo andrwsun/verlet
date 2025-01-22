@@ -1,5 +1,5 @@
 Verlet Integration Fabric Simulator
-Not optimized, or written professionally! 
+not optimized at all LMAO. 
 
 Things I wanted to put into this but was not good enough at coding:
  1. Quadtree optimization
